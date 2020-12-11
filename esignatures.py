@@ -70,6 +70,29 @@ class Signer:
         return t
 
 
+class Placeholder:
+
+    def __init__(self, api_key, value="", document_elements=""):
+        
+        if len(value) == 0 and len(document_elements) == 0:
+            raise ESignaturesError("Both value and document_elements cannot be empty in a placeholder field.")
+            
+        self.api_key = api_key
+        self.value = value
+        self.document_elements = document_elements
+    
+    def get_data(self):
+        t = {
+            "api_key": self.api_key
+        }
+
+        if len(self.value) > 0 and len(self.document_elements) == 0:
+            t["value"] = self.value
+        
+        if len(self.document_elements) > 0 and len(self.value) == 0:
+            t["document_elements"] = self.document_elements
+        
+        return t
 
 
 class ESginatures:
@@ -120,7 +143,17 @@ class ESginatures:
         title: str = "",
         metadata: str = "",
         locale: str = "en",
-        test: str = "no"
+        test: str = "no",
+        placeholders: List[Placeholder] = [],
+        signer_fields: List[dict] = {},
+        signature_request_subject: str = "",
+        signature_request_text: str = "",
+        final_contract_subject: str = "",
+        final_contract_text: str = "",
+        cc_email_addresses: List[str] = [],
+        reply_to: str = "",
+        branding_company_name: str = "",
+        branding_logo_url: str = ""
     ):
         data = {
             "template_id": template_id,
@@ -135,7 +168,54 @@ class ESginatures:
         if len(metadata) > 0:
             data["metadata"] = metadata
         
+        if len(placeholders) > 0:
+            data["placeholder"] = [placeholder.get_data() for placeholder in placeholders]
+        
+        if len(signer_fields) > 0:
+            data["signer_fields"] = signer_fields
+        
+        if (len(signature_request_subject) > 0 or
+            len(signature_request_text) > 0 or
+            len(final_contract_subject) > 0 or
+            len(final_contract_text) > 0 or
+            len(cc_email_addresses) > 0 or
+            len(reply_to) > 0
+            ):
+            emails = {}
 
+            if len(signature_request_subject) > 0:
+                emails["signature_request_subject"] = signature_request_subject
+            
+            if len(signature_request_text) > 0:
+                emails["signature_request_text"] = signature_request_text
+            
+            if len(final_contract_subject) > 0:
+                emails["final_contract_subject"] = final_contract_subject
+            
+            if len(final_contract_text) > 0:
+                emails["final_contract_text"] = final_contract_text
+
+            if len(cc_email_addresses) > 0:
+                emails["cc_email_addresses"] = cc_email_addresses
+            
+            if len(reply_to) > 0:
+                emails["reply_to"] = reply_to
+            
+
+            data["emails"] = emails
+        
+        if len(branding_company_name) > 0 or len(branding_logo_url) > 0:
+            
+            custom_branding = {}
+
+            if len(branding_company_name) > 0:
+                custom_branding["company_name"] = branding_company_name
+            
+            if len(branding_logo_url) > 0:
+                custom_branding["logo_url"] = branding_logo_url
+
+            data["custom_branding"] = custom_branding
+        
 
         logger.debug(data)
 
