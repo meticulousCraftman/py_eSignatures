@@ -245,3 +245,16 @@ class ESginatures:
             logger.error(f"Error message: {r.text}")
 
             raise ESignaturesError(f"Unable to query contract. Status Code: {r.status_code}")
+
+    def withdraw_contract(self, contract_id):
+        url = self.base_url + f"contracts/{contract_id}/withdraw"
+        response = requests.post(url)
+
+        if response.status_code == requests.codes.ok:
+            return response.json()
+        
+        else:
+            logger.error(f"Unable to withdraw contract. Status code: {response.status_code}")
+            logger.error(f"Error message: {response.text}")
+
+            raise ESignaturesError(f"Unable to withdraw contract. Status Code: {response.status_code}")
