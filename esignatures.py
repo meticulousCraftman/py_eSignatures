@@ -132,7 +132,7 @@ class ESginatures:
             return response.json()["data"]
         
         else:
-            logger.error(f"Unable to get list of templates. Status code: {r.status_code}")
+            logger.error(f"Unable to query template. Status code: {r.status_code}")
             logger.error(f"Error message: {r.text}")
 
             raise ESignaturesError(f"Unable to query template. Status Code: {r.status_code}")
@@ -230,3 +230,18 @@ class ESginatures:
             logger.error(f"Error message: {response.text}")
 
             raise ESignaturesError(f"Unable to query template. Status Code: {response.status_code}")
+
+
+    def query_contract(self, contract_id: str):
+        
+        url = self.base_url + f"contracts/{contract_id}"
+        response = requests.get(url)
+
+        if response.status_code == requests.codes.ok:
+            return response.json()["data"]
+        
+        else:
+            logger.error(f"Unable to query contract. Status code: {r.status_code}")
+            logger.error(f"Error message: {r.text}")
+
+            raise ESignaturesError(f"Unable to query contract. Status Code: {r.status_code}")
